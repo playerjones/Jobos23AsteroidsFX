@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>dk.sdu.cbse</groupId>
   <artifactId>AsteroidsFX</artifactId>
@@ -8,32 +8,34 @@
 
   <modules>
     <module>Core</module>
+    <module>Common</module>
     <module>Enemy</module>
     <module>Player</module>
-    <module>Common</module>
   </modules>
 
   <properties>
+    <java>java</java>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.9</maven.compiler.source>
-    <maven.compiler.target>1.9</maven.compiler.target>
+    <maven.compiler.source>20</maven.compiler.source>
+    <maven.compiler.target>20</maven.compiler.target>
   </properties>
   <dependencyManagement>
     <dependencies>
+      <!-- Add dependencies here if needed -->
       <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-controls</artifactId>
-        <version>23.0.2</version>
+        <version>21.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-graphics</artifactId>
-        <version>23.0.2</version>
+        <version>21.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-base</artifactId>
-        <version>23.0.2</version>
+        <version>21.0.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -54,6 +56,7 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>1.6.0</version>
+        <inherited>false</inherited>
         <executions>
           <execution>
             <goals>
@@ -62,20 +65,27 @@
           </execution>
         </executions>
         <configuration>
-          <executable>${java.home}/bin/java</executable>
+          <executable>${java}</executable>
+          <workingDirectory>.</workingDirectory>
+          <longModulepath>false</longModulepath>
           <arguments>
             <argument>-XstartOnFirstThread</argument>
             <argument>-Dorg.lwjgl.util.Debug=true</argument>
             <argument>-Djava.library.path=libs</argument>
             <argument>--module-path=mods-mvn</argument>
             <argument>--class-path=libs/*</argument>
+            <!-- because spark.core is an automatic module and actually required,
+            monitor.observer.zero would be resolved as well and does not need
+            to be added explicitly;
+            I still wanted to do it for clarity, but for some reason that results
+            in "java.lang.module.FindException: Module monitor.observer.zero not found";
+            strange... -->
+            <!--<argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
             <argument>--module=Core/dk.sdu.cbse.main.Main</argument>
-            <argument>--add-modules javafx.controls,javafx.graphics</argument>
-
+            <argument>--add-modules javafx.graphics</argument>
           </arguments>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
   <profiles>
