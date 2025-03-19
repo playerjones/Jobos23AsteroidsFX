@@ -4,11 +4,11 @@
   <parent>
     <artifactId>AsteroidsFX</artifactId>
     <groupId>dk.sdu.cbse</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>Enemy</artifactId>
-  <version>1.0-SNAPSHOT</version>
+
   <packaging>jar</packaging>
   <name>Enemy</name>
 </project>
