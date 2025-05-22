@@ -13,6 +13,8 @@
     <module>Player</module>
     <module>Bullet</module>
     <module>CommonBullet</module>
+    <module>Asteroids</module>
+    <module>CommonAsteroids</module>
   </modules>
 
   <properties>
