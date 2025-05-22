@@ -1,11 +1,12 @@
 package dk.sdu.cbse.asteroid;
 
+import java.util.Random;
+
 import dk.sdu.cbse.common.asteroids.Asteroid;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.services.IGamePluginService;
-import java.util.Random;
 
 
 public class AsteroidPlugin implements IGamePluginService {
@@ -27,8 +28,15 @@ public class AsteroidPlugin implements IGamePluginService {
     private Entity createAsteroid(GameData gameData) {
         Entity asteroid = new Asteroid();
         Random rnd = new Random();
-        int size = rnd.nextInt(10) + 5;
-        asteroid.setPolygonCoordinates(size, -size, -size, -size, -size, size, size, size);
+        int size = rnd.nextInt(10) + 20; 
+        double[] coords = new double[16];
+        for (int i = 0; i < 8; i++) {
+            double angle = Math.toRadians(i * 45);
+            double radius = size + rnd.nextInt(6) - 3; 
+            coords[i * 2] = Math.cos(angle) * radius;
+            coords[i * 2 + 1] = Math.sin(angle) * radius;
+        }
+        asteroid.setPolygonCoordinates(coords);
         asteroid.setX(0);
         asteroid.setY(0);
         asteroid.setRadius(size);
