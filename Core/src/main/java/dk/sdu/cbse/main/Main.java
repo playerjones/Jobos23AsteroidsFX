@@ -19,7 +19,9 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -55,6 +57,9 @@ public class Main extends Application {
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, true);
             }
+            if (event.getCode().equals(KeyCode.DOWN)) {
+                gameData.getKeys().setKey(GameKeys.DOWN, true); 
+        }
         });
         scene.setOnKeyReleased(event -> {
             if (event.getCode().equals(KeyCode.LEFT)) {
@@ -69,7 +74,9 @@ public class Main extends Application {
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, false);
             }
-
+            if (event.getCode().equals(KeyCode.DOWN)) {
+                gameData.getKeys().setKey(GameKeys.DOWN, false);
+            }
         });
 
         // Lookup all Game Plugins using ServiceLoader
@@ -129,6 +136,13 @@ public class Main extends Application {
             polygon.setRotate(entity.getRotation());
         }
 
+        // Enity counter
+        gameWindow.getChildren().removeIf(node -> node instanceof Text && ((Text) node).getText().startsWith("Entities: "));
+        Text entityCountText = new Text(10, 40, "Entities: " + world.getEntities().size());
+        entityCountText.setFill(Color.BLACK);
+        entityCountText.setFont(new Font(16));
+        gameWindow.getChildren().add(entityCountText);
+        entityCountText.toFront(); 
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {

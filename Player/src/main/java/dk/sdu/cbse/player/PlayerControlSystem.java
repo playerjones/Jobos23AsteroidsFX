@@ -1,17 +1,15 @@
 package dk.sdu.cbse.player;
 
-import dk.sdu.cbse.common.bullet.Bullet;
+import java.util.Collection;
+import java.util.ServiceLoader;
+import static java.util.stream.Collectors.toList;
+
 import dk.sdu.cbse.common.bullet.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.GameKeys;
 import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
-
-import java.util.Collection;
-import java.util.ServiceLoader;
-
-import static java.util.stream.Collectors.toList;
 
 
 public class PlayerControlSystem implements IEntityProcessingService {
@@ -32,9 +30,19 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 player.setX(player.getX() + changeX);
                 player.setY(player.getY() + changeY);
             }
-            if(gameData.getKeys().isDown(GameKeys.SPACE)) {
+            if (gameData.getKeys().isDown(GameKeys.DOWN)) {
+                double changeX = Math.cos(Math.toRadians(player.getRotation()));
+                double changeY = Math.sin(Math.toRadians(player.getRotation()));
+                player.setX(player.getX() - changeX);
+                player.setY(player.getY() - changeY);
+            }
+            if (gameData.getKeys().isDown(GameKeys.SPACE)) {
                 getBulletSPIs().stream().findFirst().ifPresent(
-                        spi -> {world.addEntity(spi.createBullet(player, gameData));}
+                    spi -> {
+                        Entity bullet = spi.createBullet(player, gameData);
+                        world.addEntity(bullet);
+                        System.out.println("Bullet added to world: " + bullet.getID() + " at (" + bullet.getX() + ", " + bullet.getY() + ")");
+                    }
                 );
             }
 
@@ -53,8 +61,6 @@ public class PlayerControlSystem implements IEntityProcessingService {
             if (player.getY() > gameData.getDisplayHeight()) {
                 player.setY(gameData.getDisplayHeight()-1);
             }
-
-
         }
     }
 

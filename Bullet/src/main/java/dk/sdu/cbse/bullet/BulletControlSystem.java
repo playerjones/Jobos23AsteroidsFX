@@ -17,6 +17,13 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
             double changeY = Math.sin(Math.toRadians(bullet.getRotation()));
             bullet.setX(bullet.getX() + changeX * 3);
             bullet.setY(bullet.getY() + changeY * 3);
+
+            // Remove bullet if it leaves the screen
+            if (bullet.getX() < 0 || bullet.getX() > gameData.getDisplayWidth()
+                    || bullet.getY() < 0 || bullet.getY() > gameData.getDisplayHeight()) {
+                world.removeEntity(bullet);
+                System.out.println("Bullet removed: " + bullet.getID());
+            }
         }
     }
 
