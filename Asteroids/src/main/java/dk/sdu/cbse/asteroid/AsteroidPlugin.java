@@ -19,13 +19,13 @@ public class AsteroidPlugin implements IGamePluginService {
     @Override
     public void stop(GameData gameData, World world) {
         // Remove entities
-        for (Entity asteroid : world.getEntities(Asteroids.class)) {
+        for (Entity asteroid : world.getEntities(Asteroid.class)) {
             world.removeEntity(asteroid);
         }
     }
 
     private Entity createAsteroid(GameData gameData) {
-        Entity asteroid = new Asteroids();
+        Entity asteroid = new Asteroid();
         Random rnd = new Random();
         int size = rnd.nextInt(10) + 5;
         asteroid.setPolygonCoordinates(size, -size, -size, -size, -size, size, size, size);
