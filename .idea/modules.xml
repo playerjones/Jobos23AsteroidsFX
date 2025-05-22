@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Bullet/Bullet.iml" filepath="$PROJECT_DIR$/Bullet/Bullet.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AsteroidsFX.iml" filepath="$PROJECT_DIR$/AsteroidsFX.iml" />
     </modules>
   </component>
 </project>

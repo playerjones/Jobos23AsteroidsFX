@@ -9,6 +9,8 @@
         <option value="$PROJECT_DIR$/Player/pom.xml" />
         <option value="$PROJECT_DIR$/Enemy/pom.xml" />
         <option value="$PROJECT_DIR$/Common/pom.xml" />
+        <option value="$PROJECT_DIR$/Bullet/pom.xml" />
+        <option value="$PROJECT_DIR$/CommonBullet/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
