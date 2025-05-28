@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.ServiceLoader;
 import static java.util.stream.Collectors.toList;
 
-import dk.sdu.cbse.common.bullet.BulletSPI;
+import dk.sdu.cbse.bullet.BulletSPI;
 import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.GameKeys;

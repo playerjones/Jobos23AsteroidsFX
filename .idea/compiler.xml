@@ -17,5 +17,8 @@
         <module name="Common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="BulletPlugin" target="9" />
+    </bytecodeTargetLevel>
   </component>
 </project>

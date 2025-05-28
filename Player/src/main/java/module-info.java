@@ -1,6 +1,6 @@
 import dk.sdu.cbse.common.services.IGamePluginService;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
-import dk.sdu.cbse.common.bullet.BulletSPI;
+import dk.sdu.cbse.bullet.BulletSPI;
 
 module Player {
     requires Common;

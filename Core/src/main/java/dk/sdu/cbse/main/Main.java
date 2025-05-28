@@ -1,9 +1,13 @@
 package dk.sdu.cbse.main;
 
-
+import java.io.IOException;
+import java.lang.module.Configuration;
+import java.lang.module.ModuleFinder;
+import java.nio.file.*;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.Collection;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.stream.Collectors.toList;
 
@@ -39,55 +43,42 @@ public class Main extends Application {
 
     @Override
     public void start(Stage window) throws Exception {
+        // Load JAR-based plugins
+        loadPlugins();
+
+        // Classpath-plugins
+        System.out.println("ClassPath-plugins:");
+        for (IGamePluginService plugin : getPluginServices()) {
+            System.out.println(" - " + plugin.getClass().getName());
+            plugin.start(gameData, world);
+        }
+
+        for (Entity entity : world.getEntities()) {
+            Polygon polygon = new Polygon(entity.getPolygonCoordinates());
+            polygons.put(entity, polygon);
+            gameWindow.getChildren().add(polygon);
+        }
+
         Text text = new Text(10, 20, "Destroyed asteroids: " + asteroidsDestroyed);
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         gameWindow.getChildren().add(text);
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.LEFT)) {
-                gameData.getKeys().setKey(GameKeys.LEFT, true);
-            }
-            if (event.getCode().equals(KeyCode.RIGHT)) {
-                gameData.getKeys().setKey(GameKeys.RIGHT, true);
-            }
-            if (event.getCode().equals(KeyCode.UP)) {
-                gameData.getKeys().setKey(GameKeys.UP, true);
-            }
-            if (event.getCode().equals(KeyCode.SPACE)) {
-                gameData.getKeys().setKey(GameKeys.SPACE, true);
-            }
-            if (event.getCode().equals(KeyCode.DOWN)) {
-                gameData.getKeys().setKey(GameKeys.DOWN, true); 
-        }
+            if (event.getCode().equals(KeyCode.LEFT)) gameData.getKeys().setKey(GameKeys.LEFT, true);
+            if (event.getCode().equals(KeyCode.RIGHT)) gameData.getKeys().setKey(GameKeys.RIGHT, true);
+            if (event.getCode().equals(KeyCode.UP)) gameData.getKeys().setKey(GameKeys.UP, true);
+            if (event.getCode().equals(KeyCode.SPACE)) gameData.getKeys().setKey(GameKeys.SPACE, true);
+            if (event.getCode().equals(KeyCode.DOWN)) gameData.getKeys().setKey(GameKeys.DOWN, true);
         });
         scene.setOnKeyReleased(event -> {
-            if (event.getCode().equals(KeyCode.LEFT)) {
-                gameData.getKeys().setKey(GameKeys.LEFT, false);
-            }
-            if (event.getCode().equals(KeyCode.RIGHT)) {
-                gameData.getKeys().setKey(GameKeys.RIGHT, false);
-            }
-            if (event.getCode().equals(KeyCode.UP)) {
-                gameData.getKeys().setKey(GameKeys.UP, false);
-            }
-            if (event.getCode().equals(KeyCode.SPACE)) {
-                gameData.getKeys().setKey(GameKeys.SPACE, false);
-            }
-            if (event.getCode().equals(KeyCode.DOWN)) {
-                gameData.getKeys().setKey(GameKeys.DOWN, false);
-            }
+            if (event.getCode().equals(KeyCode.LEFT)) gameData.getKeys().setKey(GameKeys.LEFT, false);
+            if (event.getCode().equals(KeyCode.RIGHT)) gameData.getKeys().setKey(GameKeys.RIGHT, false);
+            if (event.getCode().equals(KeyCode.UP)) gameData.getKeys().setKey(GameKeys.UP, false);
+            if (event.getCode().equals(KeyCode.SPACE)) gameData.getKeys().setKey(GameKeys.SPACE, false);
+            if (event.getCode().equals(KeyCode.DOWN)) gameData.getKeys().setKey(GameKeys.DOWN, false);
         });
 
-        // Lookup all Game Plugins using ServiceLoader
-        for (IGamePluginService iGamePlugin : getPluginServices()) {
-            iGamePlugin.start(gameData, world);
-        }
-        for (Entity entity : world.getEntities()) {
-            Polygon polygon = new Polygon(entity.getPolygonCoordinates());
-            polygons.put(entity, polygon);
-            gameWindow.getChildren().add(polygon);
-        }
         render();
         window.setScene(scene);
         window.setTitle("ASTEROIDS");
@@ -102,22 +93,21 @@ public class Main extends Application {
                 draw();
                 gameData.getKeys().update();
             }
-
         }.start();
     }
 
     private void update() {
-        for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
-            entityProcessorService.process(gameData, world);
+        for (IEntityProcessingService processor : getEntityProcessingServices()) {
+            processor.process(gameData, world);
         }
-        for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
-            postEntityProcessorService.process(gameData, world);
+        for (IPostEntityProcessingService postProcessor : getPostEntityProcessingServices()) {
+            postProcessor.process(gameData, world);
         }
     }
 
     private void draw() {
         for (Entity polygonEntity : polygons.keySet()) {
-            if(!world.getEntities().contains(polygonEntity)){
+            if (!world.getEntities().contains(polygonEntity)) {
                 Polygon removedPolygon = polygons.get(polygonEntity);
                 polygons.remove(polygonEntity);
                 gameWindow.getChildren().remove(removedPolygon);
@@ -136,13 +126,12 @@ public class Main extends Application {
             polygon.setRotate(entity.getRotation());
         }
 
-        // Enity counter
         gameWindow.getChildren().removeIf(node -> node instanceof Text && ((Text) node).getText().startsWith("Entities: "));
         Text entityCountText = new Text(10, 40, "Entities: " + world.getEntities().size());
         entityCountText.setFill(Color.BLACK);
         entityCountText.setFont(new Font(16));
         gameWindow.getChildren().add(entityCountText);
-        entityCountText.toFront(); 
+        entityCountText.toFront();
     }
 
     private Collection<? extends IGamePluginService> getPluginServices() {
@@ -155,5 +144,36 @@ public class Main extends Application {
 
     private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
         return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    }
+
+    private void loadPlugins() {
+        Path pluginDir = Path.of("plugins/jars");
+        if (!Files.exists(pluginDir)) return;
+
+        try {
+            List<Path> jarPaths = Files.walk(pluginDir)
+                    .filter(path -> path.toString().endsWith(".jar"))
+                    .toList();
+
+            ModuleFinder finder = ModuleFinder.of(jarPaths.toArray(new Path[0]));
+            ModuleLayer parent = ModuleLayer.boot();
+            Configuration config = parent.configuration()
+                    .resolve(finder, ModuleFinder.of(), List.of("Bullet"));
+
+            ModuleLayer layer = parent.defineModulesWithOneLoader(config, ClassLoader.getSystemClassLoader());
+            ClassLoader loader = layer.findLoader("Bullet");
+
+            ServiceLoader.load(IGamePluginService.class, loader)
+                    .forEach(plugin -> {
+                        System.out.println("Plugin loaded from JAR: " + plugin.getClass().getName());
+                        plugin.start(gameData, world);
+                    });
+
+            ServiceLoader.load(IEntityProcessingService.class, loader)
+                    .forEach(proc -> {});
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

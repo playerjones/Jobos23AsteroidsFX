@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/Common/pom.xml" />
         <option value="$PROJECT_DIR$/Bullet/pom.xml" />
         <option value="$PROJECT_DIR$/CommonBullet/pom.xml" />
+        <option value="$PROJECT_DIR$/plugins/Bullet/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

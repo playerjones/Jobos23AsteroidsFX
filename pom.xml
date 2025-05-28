@@ -11,11 +11,10 @@
     <module>Common</module>
     <module>Enemy</module>
     <module>Player</module>
-    <module>Bullet</module>
     <module>CommonBullet</module>
     <module>Asteroids</module>
     <module>CommonAsteroids</module>
-      <module>Collision</module>
+    <module>Collision</module>
   </modules>
 
   <properties>
