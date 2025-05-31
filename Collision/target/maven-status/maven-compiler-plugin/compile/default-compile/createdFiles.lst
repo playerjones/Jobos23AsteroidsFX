@@ -1,3 +1,2 @@
 module-info.class
-dk/sdu/cbse/collision/CollisionSystem.class
-dk/sdu/cbse/collision/CollisionDetector.class
+dk\sdu\cbse\collision\CollisionSystem.class

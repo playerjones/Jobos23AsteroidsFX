@@ -1,8 +1,11 @@
 package dk.sdu.cbse.player;
 
-import dk.sdu.cbse.common.data.Entity;
+import dk.sdu.cbse.commonspaceship.CommonSpaceShip;
 
-public class Player extends Entity {
+public class Player extends CommonSpaceShip {
+
+    public Player() {
+        super();
+        this.getPolygon().setFill(javafx.scene.paint.Color.BLUE);
+    }
 }
-
-

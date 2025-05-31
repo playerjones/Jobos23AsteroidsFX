@@ -1,50 +1,33 @@
 package dk.sdu.cbse.common.data;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- *
- * @author jcs
- */
 public class World {
+    CopyOnWriteArrayList<Entity> entities = new CopyOnWriteArrayList<>();
 
-    private final Map<String, Entity> entityMap = new ConcurrentHashMap<>();
-
-    public String addEntity(Entity entity) {
-        entityMap.put(entity.getID(), entity);
-        return entity.getID();
+    public CopyOnWriteArrayList<Entity> getEntities() {
+        return entities;
     }
 
-    public void removeEntity(String entityID) {
-        entityMap.remove(entityID);
-    }
-
-    public void removeEntity(Entity entity) {
-        entityMap.remove(entity.getID());
-    }
-
-    public Collection<Entity> getEntities() {
-        return entityMap.values();
-    }
-
-    public <E extends Entity> List<Entity> getEntities(Class<E>... entityTypes) {
-        List<Entity> r = new ArrayList<>();
-        for (Entity e : getEntities()) {
-            for (Class<E> entityType : entityTypes) {
-                if (entityType.equals(e.getClass())) {
-                    r.add(e);
-                }
+    public <E extends Entity> CopyOnWriteArrayList<E> getEntities(Class<E> type) {
+        CopyOnWriteArrayList<E> arrayList = new CopyOnWriteArrayList<>();
+        for (Entity e : this.entities) {
+            if (type.isInstance(e)) {
+                arrayList.add(type.cast(e));
             }
         }
-        return r;
+        return arrayList;
     }
 
-    public Entity getEntity(String ID) {
-        return entityMap.get(ID);
+    public void setEntities(CopyOnWriteArrayList<Entity> entities) {
+        this.entities = entities;
     }
 
+    public void addEntity(Entity e) {
+        this.entities.add(e);
+    }
+
+    public void removeEntity(Entity e) {
+        this.entities.remove(e);
+    }
 }

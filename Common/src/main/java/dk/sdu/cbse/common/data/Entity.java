@@ -1,63 +1,149 @@
 package dk.sdu.cbse.common.data;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class Entity implements Serializable {
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Polygon;
 
-    private final UUID ID = UUID.randomUUID();
-    
-    private double[] polygonCoordinates;
-    private double x;
-    private double y;
+public class Entity {
+
+    UUID id = UUID.randomUUID();
+
+    public UUID getId() {
+        return id;
+    }
+
+    private boolean isAlive = true;
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setAlive(boolean isAlive) {
+        this.isAlive = isAlive;
+    }
+
+    public void kill(GameData gameData) {
+        this.isAlive = false;
+    }
+
+    private int health;
+    private int radius;
+    private VectorRotation location = new VectorRotation();
+    private VectorRotation velocity = new VectorRotation(0, 0);
     private double rotation;
-    private float radius;
-            
 
-    public String getID() {
-        return ID.toString();
+    public int getHealth() {
+        return health;
     }
 
-
-    public void setPolygonCoordinates(double... coordinates ) {
-        this.polygonCoordinates = coordinates;
+    public void setHealth(int health) {
+        this.health = health;
     }
 
-    public double[] getPolygonCoordinates() {
-        return polygonCoordinates;
-    }
-       
-
-    public void setX(double x) {
-        this.x =x;
+    public int getRadius() {
+        return radius;
     }
 
-    public double getX() {
-        return x;
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 
-    
-    public void setY(double y) {
-        this.y = y;
+    public VectorRotation getLocation() {
+        return location;
     }
 
-    public double getY() {
-        return y;
+    public void setLocation(VectorRotation location) {
+        this.location = location;
     }
 
-    public void setRotation(double rotation) {
-        this.rotation = rotation;
+    public void setLocation(double x, double y) {
+        this.location.setX(x);
+        this.location.setY(y);
+    }
+
+    public VectorRotation getVelocity() {
+        return velocity;
+    }
+
+    public void setVelocity(VectorRotation velocity) {
+        this.velocity = velocity;
+    }
+
+    public void setVelocity(double x, double y) {
+        this.velocity.setX(x);
+        this.velocity.setY(y);
     }
 
     public double getRotation() {
         return rotation;
     }
 
-    public void setRadius(float radius) {
-        this.radius = radius;
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
     }
-        
-    public float getRadius() {
-        return this.radius;
+
+    public void setRotation(VectorRotation direction) {
+        this.rotation = Math.toDegrees(direction.angle(new VectorRotation(1, 0)));
+    }
+
+    private Polygon polygon;
+
+    public Polygon getPolygon() {
+        return this.polygon;
+    }
+
+    public void setPolygon(Polygon polygon) {
+        this.polygon = polygon;
+        this.polygon.setFill(Paint.valueOf("white"));
+    }
+
+    public void setPolygon(double... points) {
+        this.setPolygon(new Polygon(points));
+    }
+
+    public void Render(GraphicsContext gc) {
+        this.polygon.setTranslateX(this.location.getX());
+        this.polygon.setTranslateY(this.location.getY());
+        this.polygon.setRotate(this.getRotation());
+
+        if (Config.DEBUG) {
+            gc.save();
+            gc.setStroke(Paint.valueOf("red"));
+            gc.translate(this.location.getX(), this.location.getY());
+            gc.rotate(this.getRotation());
+            gc.strokeOval(-this.radius, -this.radius, this.radius * 2, this.radius * 2);
+            gc.restore();
+        }
+    }
+
+    @Override
+    public String toString() {
+
+        return String.format(
+                "%s:%s:%s:%s:%s:%s:%s:%s:%s",
+                this.getClass().getSimpleName(),
+                this.id.toString(),
+                String.valueOf(this.isAlive),
+                String.valueOf(this.health),
+                String.valueOf(this.radius),
+                this.location.toString(),
+                this.velocity.toString(),
+                String.valueOf(this.rotation),
+                this.polygon.getPoints().toString()
+        );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Entity other = (Entity) obj;
+        return this.id.equals(other.id);
     }
 }

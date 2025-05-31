@@ -1,70 +1,50 @@
 package dk.sdu.cbse.player;
 
-import java.util.Collection;
-import java.util.ServiceLoader;
-import static java.util.stream.Collectors.toList;
-
-import dk.sdu.cbse.common.bullet.BulletSPI;
-import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
-import dk.sdu.cbse.common.data.GameKeys;
+import dk.sdu.cbse.common.data.VectorRotation;
 import dk.sdu.cbse.common.data.World;
+import dk.sdu.cbse.common.data.GameData.Keys;
 import dk.sdu.cbse.common.services.IEntityProcessingService;
 
-
-public class PlayerControlSystem implements IEntityProcessingService {
+public class PlayerControlSystem implements IEntityProcessingService{
 
     @Override
-    public void process(GameData gameData, World world) {
+    public void process(World world, GameData gameData) {
 
-        for (Entity player : world.getEntities(Player.class)) {
-            if (gameData.getKeys().isDown(GameKeys.LEFT)) {
-                player.setRotation(player.getRotation() - 5);
-            }
-            if (gameData.getKeys().isDown(GameKeys.RIGHT)) {
-                player.setRotation(player.getRotation() + 5);
-            }
-            if (gameData.getKeys().isDown(GameKeys.UP)) {
-                double changeX = Math.cos(Math.toRadians(player.getRotation()));
-                double changeY = Math.sin(Math.toRadians(player.getRotation()));
-                player.setX(player.getX() + changeX);
-                player.setY(player.getY() + changeY);
-            }
-            if (gameData.getKeys().isDown(GameKeys.DOWN)) {
-                double changeX = Math.cos(Math.toRadians(player.getRotation()));
-                double changeY = Math.sin(Math.toRadians(player.getRotation()));
-                player.setX(player.getX() - changeX);
-                player.setY(player.getY() - changeY);
-            }
-            if (gameData.getKeys().isDown(GameKeys.SPACE)) {
-                getBulletSPIs().stream().findFirst().ifPresent(
-                    spi -> {
-                        Entity bullet = spi.createBullet(player, gameData);
-                        world.addEntity(bullet);
-                        System.out.println("Bullet added to world: " + bullet.getID() + " at (" + bullet.getX() + ", " + bullet.getY() + ")");
-                    }
-                );
-            }
+        for (Player player : world.getEntities(Player.class)) {
+            if (player.isAlive()) {
 
-            if (player.getX() < 0) {
-                player.setX(1);
-            }
+                player.getLocation().add(player.getVelocity());
 
-            if (player.getX() > gameData.getDisplayWidth()) {
-                player.setX(gameData.getDisplayWidth()-1);
-            }
+                if (player.getLocation().getX() < 0) {
+                    player.getLocation().setX(gameData.width - 1);
+                } else if (player.getLocation().getX() > gameData.width) {
+                    player.getLocation().setX(1);
+                }
+                if (player.getLocation().getY() < 0) {
+                    player.getLocation().setY(gameData.height - 1);
+                } else if (player.getLocation().getY() > gameData.height) {
+                    player.getLocation().setY(1);
+                }
 
-            if (player.getY() < 0) {
-                player.setY(1);
-            }
+                if (gameData.isDown(Keys.UP)) {
+                    player.accelerate();
+                }
+                if (gameData.isDown(Keys.RIGHT)) {
+                    player.rotateRight();
+                }
+                if (gameData.isDown(Keys.LEFT)) {
+                    player.rotateLeft();
+                }
+                if (gameData.isPressed(Keys.SPACE)) {
+                    player.shoot();
+                }
 
-            if (player.getY() > gameData.getDisplayHeight()) {
-                player.setY(gameData.getDisplayHeight()-1);
+                player.getVelocity().lerp(new VectorRotation(0,0), 0.02f);
+
             }
         }
+
     }
 
-    private Collection<? extends BulletSPI> getBulletSPIs() {
-        return ServiceLoader.load(BulletSPI.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
 }
