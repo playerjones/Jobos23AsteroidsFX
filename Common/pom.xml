@@ -8,15 +8,22 @@
   </parent>
 
   <artifactId>Common</artifactId>
-
   <name>Common</name>
+  <packaging>jar</packaging>
+
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>21.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
     </dependency>
   </dependencies>
-  <packaging>jar</packaging>
 
 </project>

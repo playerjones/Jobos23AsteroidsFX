@@ -8,14 +8,20 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Bullet" />
         <module name="Player" />
+        <module name="CommonSpaceShip" />
         <module name="Asteroids" />
         <module name="Enemy" />
-        <module name="CommonAsteroids" />
         <module name="Collision" />
-        <module name="CommonBullet" />
+        <module name="AsteroidSplitter" />
         <module name="Core" />
         <module name="Common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="CommonAsteroids" target="21" />
+      <module name="CommonBullet" target="21" />
+      <module name="CommonEnemy" target="9" />
+      <module name="GraphicalMap" target="9" />
+    </bytecodeTargetLevel>
   </component>
 </project>
