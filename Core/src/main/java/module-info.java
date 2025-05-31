@@ -15,4 +15,5 @@ module Core {
     uses IEntityProcessingService;
     uses IEntityPostProcessingService;
     uses IWorldProvider;
+    uses IGraphicProvider;
 }

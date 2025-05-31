@@ -12,6 +12,8 @@
         <option value="$PROJECT_DIR$/Bullet/pom.xml" />
         <option value="$PROJECT_DIR$/CommonBullet/pom.xml" />
         <option value="$PROJECT_DIR$/GraphicalMap/pom.xml" />
+        <option value="$PROJECT_DIR$/CommonSpaceShip/pom.xml" />
+        <option value="$PROJECT_DIR$/AsteroidSplitter/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

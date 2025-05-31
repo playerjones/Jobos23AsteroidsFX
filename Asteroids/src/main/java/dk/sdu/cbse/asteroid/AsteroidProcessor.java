@@ -31,7 +31,6 @@ public class AsteroidProcessor implements IEntityProcessingService {
                 angularVelocity = (float) (angularVelocity * Math.pow(asteroid.getVelocity().length(), 0.5));
                 asteroid.setRotation(asteroid.getRotation() + angularVelocity);
             } else {
-                System.out.println("Removing asteroid " + asteroid.getId());
                 world.removeEntity(asteroid);
             }
             if (asteroid.getLocation().getX() < 0 || asteroid.getLocation().getX() > gameData.width

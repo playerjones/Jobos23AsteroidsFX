@@ -16,6 +16,7 @@
     <module>Collision</module>
     <module>AsteroidSplitter</module>
     <module>CommonSpaceShip</module>
+    <module>Graphics</module>
   </modules>
 
   <properties>
@@ -95,6 +96,12 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

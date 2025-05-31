@@ -4,14 +4,9 @@ import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.GameData;
 import dk.sdu.cbse.common.data.World;
 import dk.sdu.cbse.common.data.GameData.Keys;
-import dk.sdu.cbse.common.services.IEntityPostProcessingService;
-import dk.sdu.cbse.common.services.IEntityProcessingService;
-import dk.sdu.cbse.common.services.IGamePlugin;
-import dk.sdu.cbse.common.services.IWorldProvider;
+import dk.sdu.cbse.common.services.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -19,6 +14,7 @@ import java.lang.module.ModuleFinder;
 import java.nio.file.Paths;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -26,6 +22,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
@@ -36,6 +33,8 @@ public class Game {
 
     GameData gameData = new GameData();
     World world = new World();
+    private final Map<Entity, Node> entitySprites = new HashMap<>();
+
 
     public Game(Collection<? extends IEntityProcessingService> processingServices, Collection<? extends IEntityPostProcessingService> postProcessingServices) {
         this.processingServices = processingServices;
@@ -58,19 +57,27 @@ public class Game {
 
         gameWindow.getChildren().add(scoreText);
         gameWindow.getChildren().add(canvas);
-        gameWindow.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+
+        Background fallback = new Background(new BackgroundFill(Color.BLACK, null, null));
+
+        Background background = ServiceLoader
+                .load(layer, IGraphicProvider.class)
+                .findFirst()
+                .map(IGraphicProvider::getBackground)
+                .orElse(fallback);
+
+        gameWindow.setBackground(background);
+
 
         Scene scene = new Scene(gameWindow);
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             gameData.width = (int)((double) newVal);
             canvas.setWidth(gameData.width);
-            System.out.println(newVal);
         });
         primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
             gameData.height = (int) ((double) newVal);
             canvas.setHeight(gameData.height);
-            System.out.println(newVal);
         });
 
         scene.setOnKeyPressed(event -> setupKeys(event, true));
@@ -81,7 +88,6 @@ public class Game {
         primaryStage.setResizable(true);
         primaryStage.setOnCloseRequest(event -> {
             for(IGamePlugin plugin : getPlugins()) {
-                System.out.println("Closing " + plugin.getClass().getName());
                 plugin.stop(gameData, world);
             }
             System.exit(0);
@@ -164,10 +170,16 @@ public class Game {
         for (Entity e : this.world.getEntities()) {
             if (!e.isAlive()) {
                 Polygon removedPolygon = e.getPolygon();
+                Node removedSprite = entitySprites.remove(e);
                 this.world.removeEntity(e);
+
                 gameWindow.getChildren().remove(removedPolygon);
+                if (removedSprite != null) {
+                    gameWindow.getChildren().remove(removedSprite);
+                }
                 continue;
             }
+
 
             if (!gameWindow.getChildren().contains(e.getPolygon())) {
                 gameWindow.getChildren().add(e.getPolygon());
@@ -175,6 +187,32 @@ public class Game {
 
             e.Render(gc);
         }
+
+        for (Entity e : world.getEntities()) {
+            if (!entitySprites.containsKey(e)) {
+                ServiceLoader.load(layer, IGraphicProvider.class).findFirst().ifPresent(provider -> {
+                    Node sprite = provider.createSpriteFor(e);
+                    if (sprite != null) {
+                        entitySprites.put(e, sprite);
+                        gameWindow.getChildren().add(sprite);
+                        // Hide polygon
+                        e.getPolygon().setVisible(false);
+                    }
+                });
+            }
+
+            Node sprite = entitySprites.get(e);
+            if (sprite != null) {
+                double width = sprite.getBoundsInParent().getWidth();
+                double height = sprite.getBoundsInParent().getHeight();
+
+                sprite.setLayoutX(e.getLocation().getX() - width / 2);
+                sprite.setLayoutY(e.getLocation().getY() - height / 2);
+                sprite.setRotate(e.getRotation());
+
+            }
+        }
+
     }
 
     // Services

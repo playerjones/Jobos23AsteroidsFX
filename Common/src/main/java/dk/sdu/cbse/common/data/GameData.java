@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 public class GameData {
     // Window data
-    public int width = 800;
+    public int width = 1200;
     public int height = 800;
 
     // Key data

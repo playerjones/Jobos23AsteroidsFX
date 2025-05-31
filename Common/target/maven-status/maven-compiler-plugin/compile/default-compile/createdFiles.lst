@@ -1,5 +1,6 @@
 dk\sdu\cbse\common\data\GameData.class
 dk\sdu\cbse\common\data\GameKeys.class
+dk\sdu\cbse\common\services\IGraphicProvider.class
 dk\sdu\cbse\common\services\IBulletSPI.class
 dk\sdu\cbse\common\services\IGamePlugin.class
 dk\sdu\cbse\common\data\VectorRotation.class

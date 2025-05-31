@@ -6,6 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="Graphics" />
         <module name="Bullet" />
         <module name="Player" />
         <module name="CommonSpaceShip" />
@@ -18,8 +19,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="CommonAsteroids" target="21" />
-      <module name="CommonBullet" target="21" />
+      <module name="CommonAsteroids" target="9" />
+      <module name="CommonBullet" target="9" />
       <module name="CommonEnemy" target="9" />
       <module name="GraphicalMap" target="9" />
     </bytecodeTargetLevel>

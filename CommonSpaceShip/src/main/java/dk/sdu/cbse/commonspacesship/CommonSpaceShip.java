@@ -7,6 +7,7 @@ import dk.sdu.cbse.common.data.Entity;
 import dk.sdu.cbse.common.data.VectorRotation;
 import dk.sdu.cbse.common.services.IBulletSPI;
 
+
 public class CommonSpaceShip extends Entity {
     public static final double SHIP_SIZING = 5;
     /**
@@ -21,6 +22,7 @@ public class CommonSpaceShip extends Entity {
      * Value for how much time must pass between shots
      */
     protected long shootingDelay = 500;
+
 
     public CommonSpaceShip() {
         super();
