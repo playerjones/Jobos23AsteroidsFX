@@ -14,6 +14,8 @@ public class Asteroid extends Entity {
     private double sizing = ASTEROID_SIZING;
     private int sides = 3;
 
+    public static IAsteroidSPI testSPIOverride = null;
+
     public Asteroid(double sizing) {
         super();
         this.sizing = sizing;
@@ -54,15 +56,19 @@ public class Asteroid extends Entity {
     @Override
     public void kill(GameData gameData) {
         super.kill(gameData);
-        // Add score and split.
-        // Add 1/10th of the radius to the score
+
         gameData.addScore((int) (this.getRadius() * 0.1));
-        // If the asteroid is larger than 1.3 times the ASTEROID_SIZING, split it
+
         if (this.getRadius() >= ASTEROID_SIZING * Config.SIZING * 1.3) {
-            // Find a service if it's present. If not nothing happens.
-            ServiceLoader.load(IAsteroidSPI.class).findFirst().ifPresent(asteroidSPI -> {
-                asteroidSPI.spawnEntity(this);
-            });
+            // Use test hook if there, else use ServiceLoader
+            IAsteroidSPI spi = testSPIOverride != null
+                    ? testSPIOverride
+                    : ServiceLoader.load(IAsteroidSPI.class).findFirst().orElse(null);
+
+            if (spi != null) {
+                spi.spawnEntity(this);
+            }
         }
     }
+
 }
