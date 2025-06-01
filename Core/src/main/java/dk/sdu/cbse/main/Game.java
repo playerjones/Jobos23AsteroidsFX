@@ -28,6 +28,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.springframework.web.client.RestTemplate;
+
 
 public class Game {
 
@@ -90,6 +92,15 @@ public class Game {
             for(IGamePlugin plugin : getPlugins()) {
                 plugin.stop(gameData, world);
             }
+            try {
+                int score = gameData.getScore().get();
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.postForObject("http://localhost:8080/score", score, Void.class);
+                System.out.println("Score sent: " + score);
+            } catch (Exception e) {
+                System.out.println("Failed to send score to microservice: " + e.getMessage());
+            }
+
             System.exit(0);
         });
         primaryStage.show();
